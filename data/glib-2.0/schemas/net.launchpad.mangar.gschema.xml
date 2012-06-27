@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="mangar">
+  <schema id="net.launchpad.mangar" path="/net/launchpad/mangar/">
+    <key name="collectionfolder" type="s">
+      <default>""</default>
+    </key>
+    <key name="outputfolder" type="s">
+      <default>""</default>
+    </key>
+  </schema>
+</schemalist>
