@@ -30,11 +30,8 @@ def check_files():
 	"""Check folder"""
 	home = os.getenv('HOME')
 	program_folder = home + "/.config/mangar/"
-	images_folder = home + "/.config/mangar/images/"
 	if not os.path.exists(program_folder):
 		os.mkdir(program_folder, 0700)
-	if not os.path.exists(images_folder):
-		os.mkdir(images_folder, 0700)
 
 def main():
     'constructor for your class instances'
