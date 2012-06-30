@@ -1,17 +1,27 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires about_mangar_dialog 1.0 -->
   <!-- interface-requires gtk+ 3.0 -->
   <object class="AboutMangarDialog" id="about_mangar_dialog">
-    <property name="can_focus">False</property>
+    <property translatable="yes" name="license"># Copyright (C) 2012 Chris Triantafillis &lt;christriant1995@gmail.com&gt;
+# This program is free software: you can redistribute it and/or modify it 
+# under the terms of the GNU General Public License version 3, as published 
+# by the Free Software Foundation.
+# 
+# This program is distributed in the hope that it will be useful, but 
+# WITHOUT ANY WARRANTY; without even the implied warranties of 
+# MERCHANTABILITY, SATISFACTORY QUALITY, or FITNESS FOR A PARTICULAR 
+# PURPOSE.  See the GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License along 
+# with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
+</property><property name="can_focus">False</property>
     <property name="border_width">5</property>
     <property name="icon">../media/mangar.svg</property>
     <property name="type_hint">normal</property>
     <property name="program_name">MangaR</property>
-    <property name="version">1.0.0</property>
-    <property name="copyright" translatable="yes">2012, Chris Triantafillis
-</property>
-    <property name="authors">Chris Triantafillis &lt;christriant1995@gmail.com&gt;</property>
+    <property name="version">0.1-public2</property>
+    <property name="copyright" translatable="yes">Copyright (C) 2012 Chris Triantafillis &lt;christriant1995@gmail.com&gt;</property>
+    <property name="authors">Copyright (C) 2012 Chris Triantafillis &lt;christriant1995@gmail.com&gt;</property>
     <property name="translator_credits" translatable="yes">Chris Triantafillis</property>
     <property name="logo">../media/mangar.svg</property>
     <property name="wrap_license">True</property>

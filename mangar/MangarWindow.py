@@ -1,6 +1,17 @@
 # -*- Mode: Python; coding: utf-8; indent-tabs-mode: nil; tab-width: 4 -*-
 ### BEGIN LICENSE
-# This file is in the public domain
+# Copyright (C) 2012 Chris Triantafillis <christriant1995@gmail.com>
+# This program is free software: you can redistribute it and/or modify it 
+# under the terms of the GNU General Public License version 3, as published 
+# by the Free Software Foundation.
+# 
+# This program is distributed in the hope that it will be useful, but 
+# WITHOUT ANY WARRANTY; without even the implied warranties of 
+# MERCHANTABILITY, SATISFACTORY QUALITY, or FITNESS FOR A PARTICULAR 
+# PURPOSE.  See the GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License along 
+# with this program.  If not, see <http://www.gnu.org/licenses/>.
 ### END LICENSE
 
 import gettext
@@ -57,29 +68,16 @@ class MangarWindow(Window):
         self.tempfolder = tempfile.mkdtemp()
         print self.tempfolder
         self.images = []
-        
-        self.spinner = self.builder.get_object("spinner")
-        self.spinner.start()
-		self.spinner.hide()
 		
         # Code for other initialization actions should be added here.
 
     def my_on_mangatreeview_cursor_changed(self, widget, user_param=None):
-		#self.spinner.show()
-		#self.spinner.start()	
-		#self.set_spinner()
 		manga = self.get_selected_manga(0)
 		url = self.get_manga_url(manga)
 		episode = self.get_last_episode(url)
 		self.set_episodes_to_treeview(manga, episode)
 		
-	def set_spinner(self):
-		self.spinner.show()
-		
     def my_on_episodetreeview_row_activated(self, widget, path, user_param=None):
-		#spinner = self.builder.get_object("spinner")
-		self.set_spinner()
-		
 		manga = self.get_selected_manga(0)
 		manga_url = self.get_manga_url(manga)
 		episode_number = self.get_selected_episode()
@@ -105,9 +103,7 @@ class MangarWindow(Window):
 			episodes_url = final_episode_url
 			i = i + 1
 			episodes_url = episodes_url + "/" + str(i)
-		bar.hide()
 		self.ui.mangaimage.set_from_file(self.images[0])
-		spinner.stop()
 		scrolledwindow = self.builder.get_object("imagescrolledwindow")
 		scrolledwindow.set_property("min-content-width", 900)
 		
