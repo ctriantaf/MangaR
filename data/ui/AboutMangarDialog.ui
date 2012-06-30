@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <!-- interface-requires gtk+ 3.0 -->
   <!-- interface-requires about_mangar_dialog 1.0 -->
+  <!-- interface-requires gtk+ 3.0 -->
   <object class="AboutMangarDialog" id="about_mangar_dialog">
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
@@ -11,8 +11,8 @@
     <property name="version">1.0.0</property>
     <property name="copyright" translatable="yes">2012, Chris Triantafillis
 </property>
-    <property name="license" translatable="yes">GPL3</property>
     <property name="authors">Chris Triantafillis &lt;christriant1995@gmail.com&gt;</property>
+    <property name="translator_credits" translatable="yes">Chris Triantafillis</property>
     <property name="logo">../media/mangar.svg</property>
     <property name="wrap_license">True</property>
     <property name="license_type">gpl-3-0</property>

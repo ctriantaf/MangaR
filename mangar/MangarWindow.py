@@ -25,9 +25,10 @@ import tempfile
 import zipfile
 import subprocess
 import shutil
+import pickle
 
 home = os.getenv('HOME')
-images_folder = home + "/.config/mangar/images/"
+images_folder = home + "/.config/mangar/"
 extensions = [ ".cbz", ".cbr", ".cb7" ]
 collection = {}
 
@@ -45,7 +46,7 @@ class MangarWindow(Window):
 		self.collection_folder = self.settings.get_string("collectionfolder")
 		self.output_folder = self.settings.get_string("outputfolder")
         
-        #collection = self.settings.get_string_array("collectionarray")
+        collection = self.load_collection()
         self.set_collection_to_collectiontreeview(collection)
         
         modecombo = self.builder.get_object("modecombobox")
@@ -56,22 +57,34 @@ class MangarWindow(Window):
         self.tempfolder = tempfile.mkdtemp()
         print self.tempfolder
         self.images = []
-
+        
+        self.spinner = self.builder.get_object("spinner")
+        self.spinner.start()
+		self.spinner.hide()
+		
         # Code for other initialization actions should be added here.
 
-    def my_on_mangatreeview_cursor_changed(self, widget, user_param=None):		
+    def my_on_mangatreeview_cursor_changed(self, widget, user_param=None):
+		#self.spinner.show()
+		#self.spinner.start()	
+		#self.set_spinner()
 		manga = self.get_selected_manga(0)
 		url = self.get_manga_url(manga)
 		episode = self.get_last_episode(url)
 		self.set_episodes_to_treeview(manga, episode)
 		
+	def set_spinner(self):
+		self.spinner.show()
 		
     def my_on_episodetreeview_row_activated(self, widget, path, user_param=None):
+		#spinner = self.builder.get_object("spinner")
+		self.set_spinner()
+		
 		manga = self.get_selected_manga(0)
 		manga_url = self.get_manga_url(manga)
 		episode_number = self.get_selected_episode()
 		first_episode_line = self.find_first_episode_line(manga, manga_url)
-		
+
 		episode_line = ""
 		if manga == "High School of the Dead":
 			episode_line = self.get_episode_line(manga, manga_url, first_episode_line, episode_number, True)
@@ -86,19 +99,22 @@ class MangarWindow(Window):
 		self.set_pages_to_combobox(pages_number)
 		i = 1
 		episodes_url = final_episode_url
+		self.images = []
 		while ( i != pages_number + 1):
 			self.download_image(episodes_url, manga, episode_number, i)
 			episodes_url = final_episode_url
 			i = i + 1
 			episodes_url = episodes_url + "/" + str(i)
-		print self.images
+		bar.hide()
 		self.ui.mangaimage.set_from_file(self.images[0])
+		spinner.stop()
 		scrolledwindow = self.builder.get_object("imagescrolledwindow")
 		scrolledwindow.set_property("min-content-width", 900)
 		
 	def my_on_previousbutton_clicked(self, button, user_param=None):
 		page = self.ui.pagescellrenderer.get_property("text")
 		page = int(page)
+		print("page is {0}".format(page))
 		mangaimage = self.builder.get_object("mangaimage")
 		combobox = self.builder.get_object("pagecombobox")
 		if page != 1:
@@ -122,23 +138,20 @@ class MangarWindow(Window):
 	def my_on_nextbutton_clicked(self, button, user_param=None):
 		page = self.ui.pagescellrenderer.get_property("text")
 		page = int(page)
-		print page
+		print("page is {0}".format(page))
 		mangaimage = self.builder.get_object("mangaimage")
 		combobox = self.builder.get_object("pagecombobox")
 		pages_number = combobox.get_row_span_column()
 		if page != pages_number:
 			next_page = page + 1
-			print next_page
+			print("next page is {0}".format(next_page))
 			self.notebook = self.builder.get_object("notebook")
 			notebookpage = self.notebook.get_current_page()
 			if notebookpage == 0:
-				if next_page == 2:
-					mangaimage.set_from_file(self.images[1])
-				else:
-					image = self.images[page]
-					print image
-					mangaimage.clear()
-					mangaimage.set_from_file(image)
+				image = self.images[page]
+				print("image is {0}".format(image))
+				mangaimage.clear()
+				mangaimage.set_from_file(image)
 			else:
 				manga = self.get_selected_manga(1)
 				image = self.images[page]
@@ -151,12 +164,9 @@ class MangarWindow(Window):
 		self.notebook = self.builder.get_object("notebook")
 		notebookpage = self.notebook.get_current_page()
 		imagewidget = self.builder.get_object("mangaimage")		
-		page = str(combobox.get_active())
+		page = int(combobox.get_active())
 		if notebookpage == 0:
-			manga = self.get_selected_manga(0)
-			episode = str(self.get_selected_episode())
-			image_path = self.tempfolder + "/" + manga + "-" + episode + "-" + page + ".jpg"
-			imagewidget.set_from_file(image_path)
+			imagewidget.set_from_file(self.images[page])
 		else:
 			manga = self.get_selected_manga(1)
 			page = int(page)
@@ -179,7 +189,8 @@ class MangarWindow(Window):
 		treeselection = collectiontree.get_selection()
 		treemodel, treeiter = treeselection.get_selected()
 		manga = treemodel.get_value(treeiter, 0)
-		location = collection[manga]
+		#location = collection[manga]
+		location = self.collection_folder + "/" + manga
 		folder = self.tempfolder + "/" + manga
 		if not os.path.exists(folder):
 			os.mkdir(folder, 0700)
@@ -196,23 +207,30 @@ class MangarWindow(Window):
 		collection_array = []
 		for key in collection:
 			collection_array.append(key)
+		self.store_collection(collection)
 		self.set_collection_to_collectiontreeview(collection_array)
 	
 	def my_on_hidemenuitem_toggled(self, checkitem, param=None):
 		checkitem = self.builder.get_object("hidemenuitem")
+		button = self.builder.get_object("hidebutton")
 		box = self.builder.get_object("box3")
 		if checkitem.get_active() is True:
 			box.hide()
+			button.set_active(True)
 		else:
 			box.show()
+			button.set_active(False)
 			
 	def my_on_hidebutton_toggled(self, button, param=None):
 		button = self.builder.get_object("hidebutton")
+		checkitem = self.builder.get_object("hidemenuitem")
 		box = self.builder.get_object("box3")
 		if button.get_active() is True:
 			box.hide()
+			checkitem.set_active(True)
 		else:
 			box.show()
+			checkitem.set_active(False)
 		
 	def my_on_fullscreenbutton_toggled(self, button, param=None):
 		button = self.builder.get_object("fullscreenbutton")
@@ -243,6 +261,7 @@ class MangarWindow(Window):
 		button = self.builder.get_object("fullscreenbutton")
 		checkitem = self.builder.get_object("fullscreenmenuitem")
 		scrolled = self.builder.get_object("imagescrolledwindow")
+		viewport = self.builder.get_object("viewport1")
 		keyname = Gdk.keyval_name(event.keyval)
 		if keyname == "Right":
 			button = self.builder.get_object("nextbutton")
@@ -253,12 +272,6 @@ class MangarWindow(Window):
 		elif keyname == "Escape" and button.get_active() is True:
 			button.set_active(False)
 			checkitem.set_active(False)
-		elif keyname == "Down":
-			new_height = ""
-			height = scrolled.get_vadjustment()
-			if height != height.get_lower():
-				height.set_value( height.get_upper() - height.get_page_size() )
-				scrolled.set_vadjustment(height)
 		
 	def my_on_mangar_window_destroy(self, widget, param=None):
 		shutil.rmtree(self.tempfolder)
@@ -554,6 +567,7 @@ class MangarWindow(Window):
 		
 	def set_collection_to_collectiontreeview(self, collection):
 		collectionstore = self.builder.get_object("collectionstore")
+		collectionstore.clear()
 		for key in collection:
 			collectionstore.append([key])
 			
@@ -567,3 +581,20 @@ class MangarWindow(Window):
 			self.images.append(i)
 		self.images = sorted(self.images)
 		return self.images
+
+	def store_collection(self, collection):
+		collection_file = images_folder + "collection"
+		f = open(collection_file, 'wb')
+		pickle.dump(collection, f)
+		f.close()
+		
+	def load_collection(self):
+		collection = []
+		collection_file = images_folder + "collection"
+		f = open(collection_file, 'rb')
+		try:
+			collection = pickle.load(f)
+		except EOFError:
+			 return collection
+		f.close()
+		return collection

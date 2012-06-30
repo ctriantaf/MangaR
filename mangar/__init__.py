@@ -30,8 +30,15 @@ def check_files():
 	"""Check folder"""
 	home = os.getenv('HOME')
 	program_folder = home + "/.config/mangar/"
+	collection_file = program_folder + "collection"
 	if not os.path.exists(program_folder):
 		os.mkdir(program_folder, 0700)
+	try:
+		f = open(collection_file, 'rb')
+		f.close()
+    except IOError:
+        f = open(collection_file, 'wb')
+        f.close()
 
 def main():
     'constructor for your class instances'
