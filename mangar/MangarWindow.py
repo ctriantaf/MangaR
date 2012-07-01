@@ -84,34 +84,34 @@ class MangarWindow(Window):
         waitlabel = self.builder.get_object("waitlabel")
         waitlabel.show()
         time.sleep(2)
-		manga = self.get_selected_manga(0)
-		manga_url = self.get_manga_url(manga)
-		episode_number = self.get_selected_episode()
-		first_episode_line = self.find_first_episode_line(manga, manga_url)
+        manga = self.get_selected_manga(0)
+        manga_url = self.get_manga_url(manga)
+        episode_number = self.get_selected_episode()
+        first_episode_line = self.find_first_episode_line(manga, manga_url)
 
-		episode_line = ""
-		if manga == "High School of the Dead":
-			episode_line = self.get_episode_line(manga, manga_url, first_episode_line, episode_number, True)
-		elif manga == "Kimi Ni Todoke":
-			episode_line = self.get_episode_line(manga, manga_url, first_episode_line, episode_number, True)
-		else:
-			episode_line = self.get_episode_line(manga, manga_url, first_episode_line, episode_number, False)
+        episode_line = ""
+        if manga == "High School of the Dead":
+            episode_line = self.get_episode_line(manga, manga_url, first_episode_line, episode_number, True)
+        elif manga == "Kimi Ni Todoke":
+            episode_line = self.get_episode_line(manga, manga_url, first_episode_line, episode_number, True)
+        else:
+            episode_line = self.get_episode_line(manga, manga_url, first_episode_line, episode_number, False)
 			
-		episode_url = self.get_episode_url(manga_url, episode_line)
-		final_episode_url = "http://www.mangareader.net" + episode_url
-		pages_number = self.get_pages(final_episode_url)
-		self.set_pages_to_combobox(pages_number)
-		i = 1
-		episodes_url = final_episode_url
-		self.images = []
-		while ( i != pages_number + 1):
-			self.download_image(episodes_url, manga, episode_number, i)
-			episodes_url = final_episode_url
-			i = i + 1
-			episodes_url = episodes_url + "/" + str(i)
-		self.ui.mangaimage.set_from_file(self.images[0])
-		scrolledwindow = self.builder.get_object("imagescrolledwindow")
-		scrolledwindow.set_property("min-content-width", 900)
+        episode_url = self.get_episode_url(manga_url, episode_line)
+        final_episode_url = "http://www.mangareader.net" + episode_url
+        pages_number = self.get_pages(final_episode_url)
+        self.set_pages_to_combobox(pages_number)
+        i = 1
+        episodes_url = final_episode_url
+        self.images = []
+        while ( i != pages_number + 1):
+            self.download_image(episodes_url, manga, episode_number, i)
+            episodes_url = final_episode_url
+            i = i + 1
+            episodes_url = episodes_url + "/" + str(i)
+        self.ui.mangaimage.set_from_file(self.images[0])
+        scrolledwindow = self.builder.get_object("imagescrolledwindow")
+        scrolledwindow.set_property("min-content-width", 900)
         time.sleep(1)
         waitlabel.hide()
 		
