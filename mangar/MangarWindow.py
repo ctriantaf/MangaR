@@ -72,13 +72,13 @@ class MangarWindow(Window):
         # Code for other initialization actions should be added here.
 
     def my_on_mangatreeview_cursor_changed(self, widget, user_param=None):
-        waitlabel = self.builder.get_object("waitlabel")
-        waitlabel.show()
+        #waitlabel = self.builder.get_object("waitlabel")
+        #waitlabel.show()
         manga = self.get_selected_manga(0)
         url = self.get_manga_url(manga)
         episode = self.get_last_episode(url)
         self.set_episodes_to_treeview(manga, episode)
-        waitlabel.hide()
+        #waitlabel.hide()
         
     def my_on_episodetreeview_row_activated(self, widget, path, user_param=None):
         waitlabel = self.builder.get_object("waitlabel")
@@ -118,7 +118,6 @@ class MangarWindow(Window):
     def my_on_previousbutton_clicked(self, button, user_param=None):
         page = self.ui.pagescellrenderer.get_property("text")
         page = int(page)
-        print("page is {0}".format(page))
         mangaimage = self.builder.get_object("mangaimage")
         combobox = self.builder.get_object("pagecombobox")
         if page != 1:
@@ -127,7 +126,6 @@ class MangarWindow(Window):
             notebookpage = self.notebook.get_current_page()
             if notebookpage == 0:
                 ppage = previous_page - 1
-                print self.images[ppage]
                 self.ui.mangaimage.set_from_file(self.images[ppage])
                 combobox.set_active(ppage)
             else:
@@ -142,18 +140,14 @@ class MangarWindow(Window):
     def my_on_nextbutton_clicked(self, button, user_param=None):
         page = self.ui.pagescellrenderer.get_property("text")
         page = int(page)
-        print("page is {0}".format(page))
         mangaimage = self.builder.get_object("mangaimage")
         combobox = self.builder.get_object("pagecombobox")
         pages_number = combobox.get_row_span_column()
         if page != pages_number:
-            next_page = page + 1
-            print("next page is {0}".format(next_page))
             self.notebook = self.builder.get_object("notebook")
             notebookpage = self.notebook.get_current_page()
             if notebookpage == 0:
                 image = self.images[page]
-                print("image is {0}".format(image))
                 mangaimage.clear()
                 mangaimage.set_from_file(image)
             else:
@@ -162,7 +156,7 @@ class MangarWindow(Window):
                 path = self.tempfolder + "/" + manga + "/" + image
                 mangaimage.clear()
                 mangaimage.set_from_file(path)
-                combobox.set_active(page)
+            combobox.set_active(page)
 				
     def my_on_pagecombobox_changed(self, combobox, param=None):
         self.notebook = self.builder.get_object("notebook")
@@ -177,8 +171,8 @@ class MangarWindow(Window):
             image = self.images[page]
             path = self.tempfolder + "/" + manga + "/" + image
             imagewidget.set_from_file(path)
-            scrolledwindow = self.builder.get_object("imagescrolledwindow")
-            scrolledwindow.set_property("min-content-width", 900)
+        scrolledwindow = self.builder.get_object("imagescrolledwindow")
+        scrolledwindow.set_property("min-content-width", 900)
 			
     def my_on_modecombobox_changed(self, combobox, param=None):
         self.notebook = self.builder.get_object("notebook")
@@ -193,13 +187,13 @@ class MangarWindow(Window):
         treeselection = collectiontree.get_selection()
         treemodel, treeiter = treeselection.get_selected()
         manga = treemodel.get_value(treeiter, 0)
-        #location = collection[manga]
         location = self.collection_folder + "/" + manga
         folder = self.tempfolder + "/" + manga
         if not os.path.exists(folder):
             os.mkdir(folder, 0700)
         self.uncompress_manga(location, folder)
         images = self.scan_images(folder)
+        print images
         pages = len(images)
         self.set_pages_to_combobox(pages)
         path = folder + "/" + self.images[0]
@@ -259,11 +253,8 @@ class MangarWindow(Window):
             button.set_active(False)
 		
     def my_on_mangar_window_key_press_event(self, widget, event, param=None):
-        window = self.builder.get_object("mangar_window")
         button = self.builder.get_object("fullscreenbutton")
         checkitem = self.builder.get_object("fullscreenmenuitem")
-        scrolled = self.builder.get_object("imagescrolledwindow")
-        viewport = self.builder.get_object("viewport1")
         keyname = Gdk.keyval_name(event.keyval)
         if keyname == "Right":
             button = self.builder.get_object("nextbutton")
@@ -463,8 +454,8 @@ class MangarWindow(Window):
                     self.ui.episodestore.append([1])
                     self.ui.episodestore.append([0])
                     break
-        self.ui.episodestore.append([episode_int])
-        episode_int = (episode_int - 1)
+            self.ui.episodestore.append([episode_int])
+            episode_int = (episode_int - 1)
 			
     def find_first_episode_line(self, manga, manga_url):
         if manga == "Bakuman":
