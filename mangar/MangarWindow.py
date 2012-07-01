@@ -29,7 +29,7 @@ from mangar_lib import Window
 from mangar.AboutMangarDialog import AboutMangarDialog
 from mangar.PreferencesMangarDialog import PreferencesMangarDialog
 
-
+import time
 import urllib2
 import os
 import tempfile
@@ -72,12 +72,18 @@ class MangarWindow(Window):
         # Code for other initialization actions should be added here.
 
     def my_on_mangatreeview_cursor_changed(self, widget, user_param=None):
+        waitlabel = self.builder.get_object("waitlabel")
+        waitlabel.show()
 		manga = self.get_selected_manga(0)
 		url = self.get_manga_url(manga)
 		episode = self.get_last_episode(url)
 		self.set_episodes_to_treeview(manga, episode)
-		
+        waitlabel.hide()
+        
     def my_on_episodetreeview_row_activated(self, widget, path, user_param=None):
+        waitlabel = self.builder.get_object("waitlabel")
+        waitlabel.show()
+        time.sleep(2)
 		manga = self.get_selected_manga(0)
 		manga_url = self.get_manga_url(manga)
 		episode_number = self.get_selected_episode()
@@ -106,6 +112,8 @@ class MangarWindow(Window):
 		self.ui.mangaimage.set_from_file(self.images[0])
 		scrolledwindow = self.builder.get_object("imagescrolledwindow")
 		scrolledwindow.set_property("min-content-width", 900)
+        time.sleep(1)
+        waitlabel.hide()
 		
 	def my_on_previousbutton_clicked(self, button, user_param=None):
 		page = self.ui.pagescellrenderer.get_property("text")
