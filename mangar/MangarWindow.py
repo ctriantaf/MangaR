@@ -79,20 +79,20 @@ class MangarWindow(Window):
         self.set_episodes_to_treeview(manga, episode)
         
     def my_on_episodetreeview_row_activated(self, widget, path, user_param=None):
-		self.start_animation()
-		thread = threading.Thread(target=self.sub_episodetreeview_row_activated)
+        self.start_animation()
+        thread = threading.Thread(target=self.sub_episodetreeview_row_activated)
         thread.start()
         
     def start_animation(self):
-		spinner = self.builder.get_object("spinner")
-		spinner.show()
-		spinner.start()
+        spinner = self.builder.get_object("spinner")
+        spinner.show()
+        spinner.start()
 	
-	def sub_episodetreeview_row_activated(self):
-		spinner = self.builder.get_object("spinner")
-		print "started" 
-		manga = self.get_selected_manga(0)
-		print manga
+    def sub_episodetreeview_row_activated(self):
+        spinner = self.builder.get_object("spinner")
+        print "started" 
+        manga = self.get_selected_manga(0)
+        print manga
         manga_url = self.get_manga_url(manga)
         episode_number = self.get_selected_episode()
         first_episode_line = self.find_first_episode_line(manga, manga_url)
@@ -121,8 +121,8 @@ class MangarWindow(Window):
         self.ui.mangaimage.set_from_file(self.images[0])
         scrolledwindow = self.builder.get_object("imagescrolledwindow")
         scrolledwindow.set_property("min-content-width", 900)
-		spinner.stop()
-		spinner.hide()
+        spinner.stop()
+        spinner.hide()
 		
     def my_on_previousbutton_clicked(self, button, user_param=None):
         page = self.ui.pagescellrenderer.get_property("text")
