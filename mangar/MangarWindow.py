@@ -37,6 +37,7 @@ import zipfile
 import subprocess
 import shutil
 import pickle
+import threading
 
 home = os.getenv('HOME')
 images_folder = home + "/.config/mangar/"
@@ -72,19 +73,26 @@ class MangarWindow(Window):
         # Code for other initialization actions should be added here.
 
     def my_on_mangatreeview_cursor_changed(self, widget, user_param=None):
-        #waitlabel = self.builder.get_object("waitlabel")
-        #waitlabel.show()
         manga = self.get_selected_manga(0)
         url = self.get_manga_url(manga)
         episode = self.get_last_episode(url)
         self.set_episodes_to_treeview(manga, episode)
-        #waitlabel.hide()
         
     def my_on_episodetreeview_row_activated(self, widget, path, user_param=None):
-        waitlabel = self.builder.get_object("waitlabel")
-        waitlabel.show()
-        time.sleep(2)
-        manga = self.get_selected_manga(0)
+		self.start_animation()
+		thread = threading.Thread(target=self.sub_episodetreeview_row_activated)
+        thread.start()
+        
+    def start_animation(self):
+		spinner = self.builder.get_object("spinner")
+		spinner.show()
+		spinner.start()
+	
+	def sub_episodetreeview_row_activated(self):
+		spinner = self.builder.get_object("spinner")
+		print "started" 
+		manga = self.get_selected_manga(0)
+		print manga
         manga_url = self.get_manga_url(manga)
         episode_number = self.get_selected_episode()
         first_episode_line = self.find_first_episode_line(manga, manga_url)
@@ -104,6 +112,7 @@ class MangarWindow(Window):
         i = 1
         episodes_url = final_episode_url
         self.images = []
+        print "download is started"
         while ( i != pages_number + 1):
             self.download_image(episodes_url, manga, episode_number, i)
             episodes_url = final_episode_url
@@ -112,8 +121,8 @@ class MangarWindow(Window):
         self.ui.mangaimage.set_from_file(self.images[0])
         scrolledwindow = self.builder.get_object("imagescrolledwindow")
         scrolledwindow.set_property("min-content-width", 900)
-        time.sleep(1)
-        waitlabel.hide()
+		spinner.stop()
+		spinner.hide()
 		
     def my_on_previousbutton_clicked(self, button, user_param=None):
         page = self.ui.pagescellrenderer.get_property("text")

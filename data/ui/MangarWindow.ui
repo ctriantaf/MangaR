@@ -405,10 +405,8 @@
                 <property name="can_focus">False</property>
                 <property name="use_action_appearance">False</property>
                 <child>
-                  <object class="GtkLabel" id="waitlabel">
+                  <object class="GtkSpinner" id="spinner">
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">Please wait</property>
-                    <property name="width_chars">12</property>
                   </object>
                 </child>
               </object>
