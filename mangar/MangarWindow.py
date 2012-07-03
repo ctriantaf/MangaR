@@ -80,13 +80,16 @@ class MangarWindow(Window):
         
     def my_on_episodetreeview_row_activated(self, widget, path, user_param=None):
         self.start_animation()
-        thread = threading.Thread(target=self.sub_episodetreeview_row_activated)
+        thread = threading.Thread(target=self.spinner_thread)
         thread.start()
         
     def start_animation(self):
         spinner = self.builder.get_object("spinner")
         spinner.show()
         spinner.start()
+        
+    def spinner_thread(self):
+        self.sub_episodetreeview_row_activated()
 	
     def sub_episodetreeview_row_activated(self):
         spinner = self.builder.get_object("spinner")
