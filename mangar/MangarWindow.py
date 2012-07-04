@@ -21,6 +21,7 @@ gettext.textdomain('mangar')
 from gi.repository import Gtk # pylint: disable=E0611
 from gi.repository import Gio # pylint: disable=E0611
 from gi.repository import Gdk
+from gi.repository import GObject
 
 import logging
 logger = logging.getLogger('mangar')
@@ -54,6 +55,7 @@ class MangarWindow(Window):
         super(MangarWindow, self).finish_initializing(builder)
         self.AboutDialog = AboutMangarDialog
         self.PreferencesDialog = PreferencesMangarDialog
+        GObject.threads_init()
         self.settings = Gio.Settings("net.launchpad.mangar")
         self.collection_folder = self.settings.get_string("collectionfolder")
         self.output_folder = self.settings.get_string("outputfolder")
@@ -79,20 +81,21 @@ class MangarWindow(Window):
         self.set_episodes_to_treeview(manga, episode)
         
     def my_on_episodetreeview_row_activated(self, widget, path, user_param=None):
-        self.start_animation()
-        thread = threading.Thread(target=self.spinner_thread)
-        thread.start()
+        self.start_spinner()
+        thread = threading.Thread(target=self.sub_episodetreeview_row_activated)
+        thread.start
         
-    def start_animation(self):
+    def start_spinner(self):
         spinner = self.builder.get_object("spinner")
         spinner.show()
         spinner.start()
-        
-    def spinner_thread(self):
-        self.sub_episodetreeview_row_activated()
+    
+    def stop_spinner(self):
+        spinner = self.builder.get_object("spinner")
+        spinner.stop()
+        spinner.hide()
 	
     def sub_episodetreeview_row_activated(self):
-        spinner = self.builder.get_object("spinner")
         print "started" 
         manga = self.get_selected_manga(0)
         print manga
@@ -124,8 +127,7 @@ class MangarWindow(Window):
         self.ui.mangaimage.set_from_file(self.images[0])
         scrolledwindow = self.builder.get_object("imagescrolledwindow")
         scrolledwindow.set_property("min-content-width", 900)
-        spinner.stop()
-        spinner.hide()
+        GObject.idle_add(self.stop_spinner)
 		
     def my_on_previousbutton_clicked(self, button, user_param=None):
         page = self.ui.pagescellrenderer.get_property("text")
