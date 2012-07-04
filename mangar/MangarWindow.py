@@ -57,7 +57,6 @@ class MangarWindow(Window):
         super(MangarWindow, self).finish_initializing(builder)
         self.AboutDialog = AboutMangarDialog
         self.PreferencesDialog = PreferencesMangarDialog
-        GObject.threads_init()
         self.settings = Gio.Settings("net.launchpad.mangar")
         self.collection_folder = self.settings.get_string("collectionfolder")
         self.output_folder = self.settings.get_string("outputfolder")
