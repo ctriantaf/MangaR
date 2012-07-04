@@ -44,6 +44,8 @@ images_folder = home + "/.config/mangar/"
 extensions = [ ".cbz", ".cbr", ".cb7" ]
 collection = {}
 
+GObject.threads_init()
+Gdk.threads_init()
 
 # See mangar_lib.Window.py for more details about how this class works
 class MangarWindow(Window):
