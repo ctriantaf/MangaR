@@ -22,6 +22,7 @@ from gi.repository import Gtk # pylint: disable=E0611
 from gi.repository import Gio # pylint: disable=E0611
 from gi.repository import Gdk
 from gi.repository import GObject
+#from gi.repository import pynotify
 
 import logging
 logger = logging.getLogger('mangar')
@@ -34,19 +35,15 @@ import time
 import urllib2
 import os
 import tempfile
-import zipfile
 import subprocess
 import shutil
 import pickle
-import threading
+import pynotify
 
 home = os.getenv('HOME')
 images_folder = home + "/.config/mangar/"
 extensions = [ ".cbz", ".cbr", ".cb7" ]
 collection = {}
-
-GObject.threads_init()
-Gdk.threads_init()
 
 # See mangar_lib.Window.py for more details about how this class works
 class MangarWindow(Window):
@@ -82,24 +79,7 @@ class MangarWindow(Window):
         self.set_episodes_to_treeview(manga, episode)
         
     def my_on_episodetreeview_row_activated(self, widget, path, user_param=None):
-        self.start_spinner()
-        thread = threading.Thread(target=self.sub_episodetreeview_row_activated)
-        thread.start
-        
-    def start_spinner(self):
-        spinner = self.builder.get_object("spinner")
-        spinner.show()
-        spinner.start()
-    
-    def stop_spinner(self):
-        spinner = self.builder.get_object("spinner")
-        spinner.stop()
-        spinner.hide()
-	
-    def sub_episodetreeview_row_activated(self):
-        print "started" 
         manga = self.get_selected_manga(0)
-        print manga
         manga_url = self.get_manga_url(manga)
         episode_number = self.get_selected_episode()
         first_episode_line = self.find_first_episode_line(manga, manga_url)
@@ -119,7 +99,6 @@ class MangarWindow(Window):
         i = 1
         episodes_url = final_episode_url
         self.images = []
-        print "download is started"
         while ( i != pages_number + 1):
             self.download_image(episodes_url, manga, episode_number, i)
             episodes_url = final_episode_url
@@ -128,7 +107,7 @@ class MangarWindow(Window):
         self.ui.mangaimage.set_from_file(self.images[0])
         scrolledwindow = self.builder.get_object("imagescrolledwindow")
         scrolledwindow.set_property("min-content-width", 900)
-        GObject.idle_add(self.stop_spinner)
+        self.show_notification(manga, str(episode))
 		
     def my_on_previousbutton_clicked(self, button, user_param=None):
         page = self.ui.pagescellrenderer.get_property("text")
@@ -208,7 +187,6 @@ class MangarWindow(Window):
             os.mkdir(folder, 0700)
         self.uncompress_manga(location, folder)
         images = self.scan_images(folder)
-        print images
         pages = len(images)
         self.set_pages_to_combobox(pages)
         path = folder + "/" + self.images[0]
@@ -270,6 +248,8 @@ class MangarWindow(Window):
     def my_on_mangar_window_key_press_event(self, widget, event, param=None):
         button = self.builder.get_object("fullscreenbutton")
         checkitem = self.builder.get_object("fullscreenmenuitem")
+        sw = self.builder.get_object("imagescrolledwindow")
+        adj = sw.get_vadjustment()
         keyname = Gdk.keyval_name(event.keyval)
         if keyname == "Right":
             button = self.builder.get_object("nextbutton")
@@ -280,6 +260,25 @@ class MangarWindow(Window):
         elif keyname == "Escape" and button.get_active() is True:
             button.set_active(False)
             checkitem.set_active(False)
+        elif keyname == "Down":
+			newval = adj.get_property("value") + adj.get_property("page_size")
+			maxval = adj.get_property("upper") - adj.get_property("page_size")
+			if newval > maxval:
+				newval = maxval
+			adj.set_property("value", newval)
+		elif keyname == "Up":
+			newval = adj.get_property("value") - adj.get_property("page_size")
+			if newval < adj.get_property("lower"): 
+				newval = adj.get_property("lower")
+			adj.set_property("value", newval)
+
+		
+	def pagedown(self, sw):
+		newval = sw.props.vadjustment.value + sw.props.vadjustment.page_size
+		max = sw.props.vadjustment.upper - sw.props.vadjustment.page_size
+		if newval > max: 
+			newval = max
+			sw.props.vadjustment.value = newval
 		
     def my_on_mangar_window_destroy(self, widget, param=None):
         shutil.rmtree(self.tempfolder)
@@ -555,6 +554,8 @@ class MangarWindow(Window):
                     image_url = line[first_index:last_index]
         episode = str(episode)
         page = str(page)
+        if manga == "1/2 Prince":
+			manga = "12 Prince"
         image_path = self.tempfolder +"/" + manga + "-" + episode + "-" + page + ".jpg"
         f = open(image_path, 'wb')
         f.write(urllib2.urlopen(image_url).read())
@@ -584,6 +585,7 @@ class MangarWindow(Window):
         
 			
     def scan_images(self, location):
+        self.images =[]
         files = os.listdir(location)
         for i in files:
             self.images.append(i)
@@ -606,3 +608,12 @@ class MangarWindow(Window):
             return collection
         f.close()
         return collection
+        
+    def show_notification(self, manga, episode):
+		app_name = "mangar_notify"
+		title = "MangaR notification:"
+		body = manga + " chapter " + episode + " is ready for reading!"
+		pynotify.init(app_name)
+		n = pynotify.Notification(title, body)
+		time.sleep(5)
+		n.close()
