@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
   <!-- interface-requires about_mangar_dialog 1.0 -->
@@ -8,7 +7,7 @@
     <property name="icon">../media/mangar.svg</property>
     <property name="type_hint">normal</property>
     <property name="program_name">MangaR</property>
-    <property name="version">0.1-public3</property>
+    <property name="version">0.2-public6</property>
     <property name="copyright" translatable="yes">Copyright (C) 2012 Chris Triantafillis &lt;christriant1995@gmail.com&gt;</property>
     <property name="website">http://clepto.github.com/MangaR/</property>
     <property name="website_label" translatable="yes">MangaR webpage</property>
@@ -28,7 +27,7 @@
     <property name="authors">Copyright (C) 2012 Chris Triantafillis &lt;christriant1995@gmail.com&gt;</property>
     <property name="documenters">Chris Triantafillis</property>
     <property name="translator_credits" translatable="yes">Chris Triantafillis</property>
-    <property name="artists">Γιώργος Καλιοντζής &lt;panoritis@gmail.com&gt;</property>
+    <property name="artists">&#915;&#953;&#974;&#961;&#947;&#959;&#962; &#922;&#945;&#955;&#953;&#959;&#957;&#964;&#950;&#942;&#962; &lt;panoritis@gmail.com&gt;</property>
     <property name="logo">../media/mangar.svg</property>
     <property name="wrap_license">True</property>
     <property name="license_type">gpl-3-0</property>
