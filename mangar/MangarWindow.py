@@ -22,7 +22,8 @@ from gi.repository import Gtk # pylint: disable=E0611
 from gi.repository import Gio # pylint: disable=E0611
 from gi.repository import Gdk
 from gi.repository import GObject
-#from gi.repository import pynotify
+from gi.repository import Notify
+
 
 import logging
 logger = logging.getLogger('mangar')
@@ -38,7 +39,6 @@ import tempfile
 import subprocess
 import shutil
 import pickle
-import pynotify
 
 home = os.getenv('HOME')
 images_folder = home + "/.config/mangar/"
@@ -107,7 +107,7 @@ class MangarWindow(Window):
         self.ui.mangaimage.set_from_file(self.images[0])
         scrolledwindow = self.builder.get_object("imagescrolledwindow")
         scrolledwindow.set_property("min-content-width", 900)
-        self.show_notification(manga, str(episode))
+        self.show_notification(manga, str(episode_number))
 		
     def my_on_previousbutton_clicked(self, button, user_param=None):
         page = self.ui.pagescellrenderer.get_property("text")
@@ -611,9 +611,9 @@ class MangarWindow(Window):
         
     def show_notification(self, manga, episode):
 		app_name = "mangar_notify"
-		title = "MangaR notification:"
-		body = manga + " chapter " + episode + " is ready for reading!"
-		pynotify.init(app_name)
-		n = pynotify.Notification(title, body)
-		time.sleep(5)
-		n.close()
+		title = "Ready"
+		body = "{0}'s chapter {1} is ready for reading!".format(manga, episode)
+		Notify.init(app_name)
+		n = Notify.Notification.new(title, body, None)
+		n.show()
+
